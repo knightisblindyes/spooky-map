@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Spooky‑Sounding Places Map</title>
+    <style>
+      /* Map size */
+      #map {
+        height: 600px;
+        width: 100%;
+      }
+      body {
+        font-family: Arial, sans-serif;
+      }
+      h2 {
+        text-align: center;
+      }
+    </style>
+    <!-- Google Maps API with your key -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAuK4mcqOBAzdGlyTW2YHnWfc_NXc-bfiQ"></script>
+    <script>
+      function initMap() {
+        const map = new google.maps.Map(document.getElementById("map"), {
+          zoom: 4,
+          center: { lat: 39.8283, lng: -98.5795 } // center of US
+        });
+
+        const spookyTowns = [
+          {name: "Big Bear Lake, CA", lat: 34.2439, lng: -116.9114, pop: 5044},
+          {name: "Casper, WY", lat: 42.8342, lng: -106.3217, pop: 58823},
+          {name: "Deadwood, SD", lat: 44.3764, lng: -103.7291, pop: 1347},
+          {name: "Devils Lake, ND", lat: 48.1120, lng: -98.8796, pop: 7314},
+          {name: "Kill Devil Hills, NC", lat: 36.0179, lng: -75.6710, pop: 7742},
+          {name: "Scarville, IA", lat: 43.47096, lng: -93.61842, pop: 75},
+          {name: "Seven Devils, NC", lat: 36.0696, lng: -82.1191, pop: 316},
+          {name: "Slaughter Beach, DE", lat: 38.8203, lng: -75.1521, pop: 247},
+          {name: "Slaughter, LA", lat: 30.8666, lng: -91.2550, pop: 989},
+          {name: "Slaughters, KY", lat: 37.1165, lng: -87.5055, pop: 187},
+          {name: "Sleepy Hollow, IL", lat: 41.8686, lng: -87.8581, pop: 3137},
+          {name: "Sleepy Hollow, NY", lat: 41.0972, lng: -73.7819, pop: 11427},
+          {name: "Tombstone, AZ", lat: 31.7137, lng: -110.0667, pop: 1382},
+          {name: "Truth or Consequences, NM", lat: 33.1283, lng: -107.2520, pop: 5942},
+          {name: "Yellville, AR", lat: 36.2297, lng: -92.6853, pop: 1169}
+        ];
+
+        // Determine min/max population for scaling
+        const pops = spookyTowns.map(t => t.pop);
+        const minPop = Math.min(...pops);
+        const maxPop = Math.max(...pops);
+
+        spookyTowns.forEach(town => {
+          // Scale marker size (min 20px, max 50px)
+          const size = 20 + 30 * (town.pop - minPop) / (maxPop - minPop);
+
+          // Scale color from light red to dark red
+          const redIntensity = 150 + Math.floor(105 * (town.pop - minPop) / (maxPop - minPop));
+          const color = `rgb(${redIntensity},0,0)`;
+
+          // Create custom marker icon
+          const icon = {
+            path: google.maps.SymbolPath.CIRCLE,
+            fillColor: color,
+            fillOpacity: 0.8,
+            scale: size / 2,
+            strokeColor: 'black',
+            strokeWeight: 1
+          };
+
+          const marker = new google.maps.Marker({
+            position: {lat: town.lat, lng: town.lng},
+            map: map,
+            title: town.name,
+            icon: icon
+          });
+
+          const infoWindow = new google.maps.InfoWindow({
+            content: `<strong>${town.name}</strong><br>Population: ${town.pop}`
+          });
+
+          // Show info on hover
+          marker.addListener('mouseover', () => infoWindow.open(map, marker));
+          marker.addListener('mouseout', () => infoWindow.close());
+        });
+      }
+
+      window.onload = initMap;
+    </script>
+  </head>
+  <body>
+    <h2>Spooky‑Sounding Places Map</h2>
+    <div id="map"></div>
+  </body>
+</html>
